@@ -15,6 +15,8 @@
 #define GAME_BOARD_START_Y 2
 
 
+int block_id; //블럭의 종류를 나타낼 int 형 변수
+
 char blockModel[][4][4] =
 {
 	/* 첫 번째 블록
@@ -223,6 +225,43 @@ void RemoveCursor()
 }
 
 
+
+void ShowBlock(char blockInfo[4][4])
+{
+	int x, y;
+	COORD curPos = GetCurrentCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			SetCurrentCursorPos(curPos.X + (x * 2), curPos.Y + y);
+			if (blockInfo[y][x] == 1)
+				printf("■");
+		}
+	}
+
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	return 0;
+}
+void DeleteBlock(char blockInfo[4][4])
+{
+	int y, x;
+	COORD curPos = GetCurrentCursorPos();
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			SetCurrentCursorPos(curPos.X + (x * 2), curPos.Y + y);
+			if (blockInfo[y][x] == 1)
+				printf("  ");
+		}
+	}
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+}
+
+
 //게임 보드 판을 그리는 함수
 void DrawGameBoard()
 {
@@ -263,6 +302,18 @@ int main()
 
 	DrawGameBoard();
 
+
+	curPos.X = GAME_BOARD_START_X + 10;
+	curPos.Y = GAME_BOARD_START_Y + 10;
+
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	block_id = 1;
+	
+	while (1) 
+	{
+		ShowBlock(blockModel[block_id]);
+	}
+	
 	
 	return 0;
 }
