@@ -11,7 +11,7 @@
 
 
 //게임보드가 시작되는 좌표 위치
-#define GAME_BOARD_START_X 4
+#define GAME_BOARD_START_X 30
 #define GAME_BOARD_START_Y 2
 
 
