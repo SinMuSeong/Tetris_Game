@@ -15,6 +15,10 @@
 #define GAME_BOARD_START_Y 2
 
 
+//게임 보드 정보 배열
+int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
+
+
 int block_id; //블럭의 종류를 나타낼 int 형 변수
 
 char blockModel[][4][4] =
