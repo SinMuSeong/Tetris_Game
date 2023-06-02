@@ -237,6 +237,22 @@ void RemoveCursor()
 }
 
 
+//게임 정보를 담은 가상 배열에 벽으로 묘사되는 위치 인덱스 1을 할당
+void setGameBoardInfo()
+{
+	int x, y;
+	for (y = 0; y < GAME_BOARD_HEIGHT; y++)
+	{
+		gameBoardInfo[y][0] = 1;
+		gameBoardInfo[y][GAME_BOARD_WIDTH + 1] = 1;
+	}
+	for (x = 0; x < GAME_BOARD_WIDTH + 2; x++)
+	{
+		gameBoardInfo[GAME_BOARD_HEIGHT][x] = 1;
+	}
+}
+
+
 
 void ShowBlock(char blockInfo[4][4])
 {
@@ -274,8 +290,29 @@ void DeleteBlock(char blockInfo[4][4])
 }
 
 
+
+int DetectCollision(int posX, int posY, char blockModel[4][4])
+{
+	int x, y;
+	int arrX = (posX - GAME_BOARD_START_X) / 2;
+	int arrY = (posY - GAME_BOARD_START_Y);
+
+	for (x = 0; x < 4; x++)
+	{
+		for (y = 0; y < 4; y++)
+		{
+			if (gameBoardInfo[arrY + y][arrX + x] == 1 && blockModel[y][x] == 1)
+				return 0;
+		}
+	}
+	return 1;
+}
+
+
 int MoveDown()
 {
+	if (!DetectCollision(curPos.X, curPos.Y + 1, blockModel[block_id]))
+		return 0;
 
 	DeleteBlock(blockModel[block_id]);
 	curPos.Y += 1;
@@ -286,6 +323,9 @@ int MoveDown()
 }
 void MoveRight()
 {
+	if (!DetectCollision(curPos.X + 2, curPos.Y, blockModel[block_id]))
+		return 0;
+
 	DeleteBlock(blockModel[block_id]);
 	curPos.X += 2;
 	SetCurrentCursorPos(curPos.X, curPos.Y);
@@ -293,6 +333,8 @@ void MoveRight()
 }
 void MoveLeft()
 {
+	if (!DetectCollision(curPos.X - 2, curPos.Y, blockModel[block_id]))
+		return 0;
 
 	DeleteBlock(blockModel[block_id]);
 	curPos.X -= 2;
@@ -305,12 +347,14 @@ void RotateBlock()
 	int block_origin = block_id - block_id % 4;		//회전하지 않은 원형 블럭의 배열 인덱스
 	int block_rotated = block_origin + (block_id + 1) % 4;	//회전된 블럭의 배열 인덱스
 
-	
+	if (!DetectCollision(curPos.X, curPos.Y, blockModel[block_rotated]))
+		return 0;
 
 	DeleteBlock(blockModel[block_id]);
 	block_id = block_rotated;
 	ShowBlock(blockModel[block_id]);
 }
+
 
 
 void InputOperationrKey()
@@ -378,9 +422,8 @@ int main()
 {
 	srand((unsigned int)time(NULL));
 	RemoveCursor();
-
-
 	DrawGameBoard();
+	setGameBoardInfo();
 
 
 	curPos.X = GAME_BOARD_START_X + 10;
@@ -389,11 +432,14 @@ int main()
 	SetCurrentCursorPos(curPos.X, curPos.Y);
 	block_id = 1;
 	
+
+	ShowBlock(blockModel[block_id]);
+
 	while (1) 
 	{
 		//MoveDown();
 		//RotateBlock();
-
+		
 		InputOperationrKey();
 
 		Sleep(100);
