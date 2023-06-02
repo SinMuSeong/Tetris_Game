@@ -262,6 +262,35 @@ void DeleteBlock(char blockInfo[4][4])
 }
 
 
+int MoveDown()
+{
+
+	DeleteBlock(blockModel[block_id]);
+	curPos.Y += 1;
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	ShowBlock(blockModel[block_id]);
+
+	return 1;
+}
+void MoveRight()
+{
+	DeleteBlock(blockModel[block_id]);
+	curPos.X += 2;
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	ShowBlock(blockModel[block_id]);
+}
+void MoveLeft()
+{
+
+	DeleteBlock(blockModel[block_id]);
+	curPos.X -= 2;
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	ShowBlock(blockModel[block_id]);
+}
+
+
+
+
 //게임 보드 판을 그리는 함수
 void DrawGameBoard()
 {
@@ -311,7 +340,10 @@ int main()
 	
 	while (1) 
 	{
-		ShowBlock(blockModel[block_id]);
+		//MoveDown();
+		MoveRight();
+		//MoveLeft();
+		Sleep(50);
 	}
 	
 	
