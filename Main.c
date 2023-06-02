@@ -288,7 +288,17 @@ void MoveLeft()
 	ShowBlock(blockModel[block_id]);
 }
 
+void RotateBlock()
+{
+	int block_origin = block_id - block_id % 4;		//회전하지 않은 원형 블럭의 배열 인덱스
+	int block_rotated = block_origin + (block_id + 1) % 4;	//회전된 블럭의 배열 인덱스
 
+	
+
+	DeleteBlock(blockModel[block_id]);
+	block_id = block_rotated;
+	ShowBlock(blockModel[block_id]);
+}
 
 
 //게임 보드 판을 그리는 함수
@@ -341,9 +351,9 @@ int main()
 	while (1) 
 	{
 		//MoveDown();
-		MoveRight();
-		//MoveLeft();
-		Sleep(50);
+		RotateBlock();
+
+		Sleep(100);
 	}
 	
 	
