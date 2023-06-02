@@ -15,6 +15,14 @@
 #define GAME_BOARD_START_Y 2
 
 
+//방향키 아스키코드 Define
+#define LEFT 75
+#define RIGHT 77
+#define UP 72
+#define SPACE 32
+
+
+
 int block_id; //블럭의 종류를 나타낼 int 형 변수
 
 char blockModel[][4][4] =
@@ -301,6 +309,35 @@ void RotateBlock()
 }
 
 
+void InputOperationrKey()
+{
+	int i, key;
+	for (i = 0; i < 20; i++)
+	{
+		if (_kbhit() != 0)
+		{
+			key = _getch();
+			switch (key)
+			{
+			case LEFT:
+				MoveLeft();
+				break;
+			case RIGHT:
+				MoveRight();
+				break;
+			case UP:
+				RotateBlock();
+				break;
+			case SPACE:
+				MoveDown();
+			}
+		}
+		Sleep(5);
+	}
+}
+
+
+
 //게임 보드 판을 그리는 함수
 void DrawGameBoard()
 {
@@ -351,7 +388,9 @@ int main()
 	while (1) 
 	{
 		//MoveDown();
-		RotateBlock();
+		//RotateBlock();
+
+		InputOperationrKey();
 
 		Sleep(100);
 	}
