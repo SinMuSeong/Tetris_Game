@@ -15,8 +15,16 @@
 #define GAME_BOARD_START_Y 2
 
 
+
 //게임 보드 정보 배열
 int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
+
+//방향키 아스키코드 Define
+#define LEFT 75
+#define RIGHT 77
+#define UP 72
+#define SPACE 32
+
 
 
 int block_id; //블럭의 종류를 나타낼 int 형 변수
@@ -266,6 +274,74 @@ void DeleteBlock(char blockInfo[4][4])
 }
 
 
+int MoveDown()
+{
+
+	DeleteBlock(blockModel[block_id]);
+	curPos.Y += 1;
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	ShowBlock(blockModel[block_id]);
+
+	return 1;
+}
+void MoveRight()
+{
+	DeleteBlock(blockModel[block_id]);
+	curPos.X += 2;
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	ShowBlock(blockModel[block_id]);
+}
+void MoveLeft()
+{
+
+	DeleteBlock(blockModel[block_id]);
+	curPos.X -= 2;
+	SetCurrentCursorPos(curPos.X, curPos.Y);
+	ShowBlock(blockModel[block_id]);
+}
+
+void RotateBlock()
+{
+	int block_origin = block_id - block_id % 4;		//회전하지 않은 원형 블럭의 배열 인덱스
+	int block_rotated = block_origin + (block_id + 1) % 4;	//회전된 블럭의 배열 인덱스
+
+	
+
+	DeleteBlock(blockModel[block_id]);
+	block_id = block_rotated;
+	ShowBlock(blockModel[block_id]);
+}
+
+
+void InputOperationrKey()
+{
+	int i, key;
+	for (i = 0; i < 20; i++)
+	{
+		if (_kbhit() != 0)
+		{
+			key = _getch();
+			switch (key)
+			{
+			case LEFT:
+				MoveLeft();
+				break;
+			case RIGHT:
+				MoveRight();
+				break;
+			case UP:
+				RotateBlock();
+				break;
+			case SPACE:
+				MoveDown();
+			}
+		}
+		Sleep(5);
+	}
+}
+
+
+
 //게임 보드 판을 그리는 함수
 void DrawGameBoard()
 {
@@ -315,7 +391,12 @@ int main()
 	
 	while (1) 
 	{
-		ShowBlock(blockModel[block_id]);
+		//MoveDown();
+		//RotateBlock();
+
+		InputOperationrKey();
+
+		Sleep(100);
 	}
 	
 	
