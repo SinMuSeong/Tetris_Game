@@ -1,4 +1,4 @@
-#pragma warning (disable:4996)
+﻿#pragma warning (disable:4996)
 #include<stdio.h>
 #include<windows.h>
 #include<time.h>
@@ -420,6 +420,13 @@ void RemoveFillUpLine()
 	}
 }
 
+int IsGameOver()
+{
+	if (!DetectCollision(curPos.X, curPos.Y, blockModel[block_id]))
+		return 1;
+
+	return 0;
+}
 
 void InputOperationKey()
 {
@@ -499,6 +506,9 @@ int main()
 		SetCurrentCursorPos(GAME_BOARD_START_X + GAME_BOARD_WIDTH, 0);
 		curPos = GetCurrentCursorPos();
 
+		//벽돌이 위에 더 생성될 수 없으면 GameOver
+		if (IsGameOver())
+			break;
 
 		while (1)		//벽돌이 떨어지는 것을 구현한 반복문
 		{
