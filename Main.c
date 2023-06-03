@@ -30,6 +30,7 @@ int score;
 int block_id; //블럭의 종류를 나타낼 int 형 변수
 int next_block_id; //다음 블럭의 종류를 나타낼 int 형 변수
 
+int checkEraseBlockCnt = 0;
 
 char blockModel[][4][4] =
 {
@@ -203,6 +204,17 @@ char blockModel[][4][4] =
 								{1, 1, 0, 0},
 								{1, 0, 0, 0},
 								{0, 0, 0, 0} },
+
+									/* 지우개 번째 블록
+
+									    □
+										    */
+								{
+									{0, 0, 0, 0},
+									{0, 1, 0, 0},
+									{0, 0, 0, 0},
+									{0, 0, 0, 0} }
+
 };
 
 
@@ -266,14 +278,23 @@ void ShowBlock(char blockInfo[4][4])
 		for (x = 0; x < 4; x++)
 		{
 			SetCurrentCursorPos(curPos.X + (x * 2), curPos.Y + y);
-			if (blockInfo[y][x] == 1)
+			if (blockInfo[y][x] == 1 && block_id != 28)
+			{
 				printf("■");
+			}
+			else if (blockInfo[y][x] == 1 && block_id == 28)
+			{
+				printf("□");
+			}
 		}
 	}
 
 	SetCurrentCursorPos(curPos.X, curPos.Y);
 	return 0;
 }
+
+
+
 void DeleteBlock(char blockInfo[4][4])
 {
 	int y, x;
@@ -292,7 +313,7 @@ void DeleteBlock(char blockInfo[4][4])
 }
 
 
-
+//충돌 판정 확인하는 함수  (해당 좌표에 대해 특정 블럭이 충돌이면 0반환)
 int DetectCollision(int posX, int posY, char blockModel[4][4])
 {
 	int x, y;
@@ -311,37 +332,131 @@ int DetectCollision(int posX, int posY, char blockModel[4][4])
 }
 
 
+//충돌 판정 확인하는 함수  (해당 좌표에 대해 지우개 블럭이 충돌이면 0반환)
+int DetectCollision_erase(int posX, int posY, char blockModel[4][4])
+{
+	int x, y;
+	int arrX = (posX - GAME_BOARD_START_X) / 2;
+	int arrY = (posY - GAME_BOARD_START_Y);
+
+	for (x = 0; x < 4; x++)
+	{
+		for (y = 0; y < 4; y++)
+		{
+			if (arrY + y >= GAME_BOARD_HEIGHT && blockModel[y][x] == 1)
+				return 0;
+			else if (arrX + x >= GAME_BOARD_WIDTH + 1 && blockModel[y][x] == 1)
+				return 0;
+			else if (arrX + x <= 0 && blockModel[y][x] == 1)
+				return 0;
+		}
+	}
+	return 1;
+}
+
+//해당 위치에 특정 블럭의 모양에 대해 블럭을 지운다.
+void setErase(int posX, int posY, char blockModel[4][4])
+{
+	int x, y;
+	int arrX = (posX - GAME_BOARD_START_X) / 2;
+	int arrY = (posY - GAME_BOARD_START_Y);
+
+	for (x = 0; x < 4; x++)
+	{
+		for (y = 0; y < 4; y++)
+		{
+			if (gameBoardInfo[arrY + y][arrX + x] == 1 && blockModel[y][x] == 1)
+				gameBoardInfo[arrY + y][arrX + x] = 0;
+		}
+	}
+
+}
+
 int MoveDown()
 {
-	if (!DetectCollision(curPos.X, curPos.Y + 1, blockModel[block_id]))
-		return 0;
+	if (block_id == 28)
+	{
+		if (!DetectCollision_erase(curPos.X, curPos.Y + 1, blockModel[block_id]))
+		{
+			setErase(curPos.X, curPos.Y, blockModel[28]);
+			return 0;
+		}
+		setErase(curPos.X, curPos.Y, blockModel[28]);
 
-	DeleteBlock(blockModel[block_id]);
-	curPos.Y += 1;
-	SetCurrentCursorPos(curPos.X, curPos.Y);
-	ShowBlock(blockModel[block_id]);
+		DeleteBlock(blockModel[block_id]);
+		curPos.Y += 1;
+		SetCurrentCursorPos(curPos.X, curPos.Y);
+		ShowBlock(blockModel[block_id]);
 
-	return 1;
+		return 1;
+	}
+	else
+	{
+		if (!DetectCollision(curPos.X, curPos.Y + 1, blockModel[block_id]))
+			return 0;
+
+		DeleteBlock(blockModel[block_id]);
+		curPos.Y += 1;
+		SetCurrentCursorPos(curPos.X, curPos.Y);
+		ShowBlock(blockModel[block_id]);
+
+		return 1;
+	}
 }
 void MoveRight()
 {
-	if (!DetectCollision(curPos.X + 2, curPos.Y, blockModel[block_id]))
-		return 0;
+	if (block_id == 28)
+	{
+		if (!DetectCollision_erase(curPos.X + 2, curPos.Y, blockModel[block_id]))
+		{
+			setErase(curPos.X, curPos.Y, blockModel[28]);
+			return 0;
+		}
+		setErase(curPos.X, curPos.Y, blockModel[28]);
 
-	DeleteBlock(blockModel[block_id]);
-	curPos.X += 2;
-	SetCurrentCursorPos(curPos.X, curPos.Y);
-	ShowBlock(blockModel[block_id]);
+		DeleteBlock(blockModel[block_id]);
+		curPos.X += 2;
+		SetCurrentCursorPos(curPos.X, curPos.Y);
+		ShowBlock(blockModel[block_id]);
+	}
+	else
+	{
+		if (!DetectCollision(curPos.X + 2, curPos.Y, blockModel[block_id]))
+			return 0;
+
+		DeleteBlock(blockModel[block_id]);
+		curPos.X += 2;
+		SetCurrentCursorPos(curPos.X, curPos.Y);
+		ShowBlock(blockModel[block_id]);
+	}
 }
 void MoveLeft()
 {
-	if (!DetectCollision(curPos.X - 2, curPos.Y, blockModel[block_id]))
-		return 0;
+	if (block_id == 28)
+	{
+		if (!DetectCollision_erase(curPos.X - 2, curPos.Y, blockModel[block_id]))
+		{
+			setErase(curPos.X, curPos.Y, blockModel[28]);
+			return 0;
+		}
 
-	DeleteBlock(blockModel[block_id]);
-	curPos.X -= 2;
-	SetCurrentCursorPos(curPos.X, curPos.Y);
-	ShowBlock(blockModel[block_id]);
+		setErase(curPos.X, curPos.Y, blockModel[28]);
+
+		DeleteBlock(blockModel[block_id]);
+		curPos.X -= 2;
+		SetCurrentCursorPos(curPos.X, curPos.Y);
+		ShowBlock(blockModel[block_id]);
+	}
+	else
+	{
+		if (!DetectCollision(curPos.X - 2, curPos.Y, blockModel[block_id]))
+			return 0;
+
+		DeleteBlock(blockModel[block_id]);
+		curPos.X -= 2;
+		SetCurrentCursorPos(curPos.X, curPos.Y);
+		ShowBlock(blockModel[block_id]);
+	}
 }
 
 void RotateBlock()
@@ -412,6 +527,7 @@ void RemoveFillUpLine()
 		if (x == GAME_BOARD_WIDTH + 1)		//한 줄이 완성이 되어있으면
 		{
 			score += 10;
+			checkEraseBlockCnt++;
 			for (line = 0; y - line > 0; line++)	//완성된 아래의 줄에서 다음 윗줄 메모리 복사
 			{
 				memcpy(&gameBoardInfo[y - line][1], &gameBoardInfo[(y - line) - 1][1],
@@ -422,6 +538,9 @@ void RemoveFillUpLine()
 		RedrawBlocks();
 	}
 }
+
+
+
 
 int IsGameOver()
 {
@@ -512,7 +631,24 @@ void ShowNextBlock()
 
 	SetCurrentCursorPos(60, 10);
 	DeleteBlock(blockModel[block_id]);
-	ShowBlock(blockModel[next_block_id]);
+	
+
+	
+	for (int y = 0; y < 4; y++)
+	{
+		for (int x = 0; x < 4; x++)
+		{
+			SetCurrentCursorPos(60+ (x * 2), 10 + y);
+			if (blockModel[next_block_id][y][x] == 1 && next_block_id != 28)
+			{
+				printf("■");
+			}
+			else if (blockModel[next_block_id][y][x] == 1 && next_block_id == 28)
+			{
+				printf("□");
+			}
+		}
+	}
 
 	SetCurrentCursorPos(temp.X, temp.Y);
 }
@@ -528,6 +664,8 @@ int main()
 
 	next_block_id = rand() % 28;  	//랜덤한 블럭 원형을 생성한다.
 
+	
+
 	while (1)		//전체 게임 진행을 위한 반복문
 	{
 		block_id = next_block_id;
@@ -535,7 +673,18 @@ int main()
 		curPos = GetCurrentCursorPos();
 		DrawScore();
 
-		next_block_id = rand() % 28;
+		if (checkEraseBlockCnt == 5)
+		{
+			next_block_id = 28;
+			checkEraseBlockCnt = 0;
+		}
+		else
+		{
+			next_block_id = rand() % 28;
+		}
+		
+
+
 		ShowNextBlock();
 
 
@@ -547,6 +696,12 @@ int main()
 		{
 			if (MoveDown() == 0)		//MoveDown은 밑에 블럭이 있어 더 내려가지 못하면 0을 반환,
 			{
+				if (block_id == 28)
+				{
+					RedrawBlocks();
+					break;
+				}
+
 				AddBlockToBoard();
 				RemoveFillUpLine();
 				break;
