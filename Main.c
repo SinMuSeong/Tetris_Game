@@ -431,6 +431,11 @@ int IsGameOver()
 	return 0;
 }
 
+void SpaceDown()
+{
+	while (MoveDown());
+}
+
 void InputOperationKey()
 {
 	int i, key;
@@ -451,7 +456,8 @@ void InputOperationKey()
 				RotateBlock();
 				break;
 			case SPACE:
-				MoveDown();
+				SpaceDown();
+				break;
 			}
 		}
 		Sleep(speed);
