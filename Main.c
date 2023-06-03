@@ -15,6 +15,7 @@
 #define GAME_BOARD_START_Y 2
 
 //방향키 아스키코드 Define
+#define STOP 8
 #define LEFT 75
 #define RIGHT 77
 #define UP 72
@@ -540,7 +541,28 @@ void RemoveFillUpLine()
 }
 
 
+void StopGame()
+{
+	int cnt = 0;
+	COORD temp = GetCurrentCursorPos();
+	SetCurrentCursorPos(60, 23);
+	printf("취소하려면 백스페이스 키를 다시 누르세요\n");
+	while (1)
+	{
+		while (!_kbhit())
+		{
+			Sleep(10);
+		}
+		int k = _getch();
 
+		if (k == STOP)
+			break;
+	}
+	SetCurrentCursorPos(60, 23);
+	printf("                                                       ");
+
+	SetCurrentCursorPos(temp.X, temp.Y);
+}
 
 int IsGameOver()
 {
@@ -577,6 +599,8 @@ void InputOperationKey()
 			case SPACE:
 				SpaceDown();
 				break;
+			case STOP:
+				StopGame();
 			}
 		}
 		Sleep(speed);
