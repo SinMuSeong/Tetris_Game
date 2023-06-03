@@ -673,7 +673,7 @@ int main()
 		curPos = GetCurrentCursorPos();
 		DrawScore();
 
-		if (checkEraseBlockCnt == 5)
+		if (checkEraseBlockCnt >= 5)
 		{
 			next_block_id = 28;
 			checkEraseBlockCnt = 0;
