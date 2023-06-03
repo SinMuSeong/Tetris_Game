@@ -28,6 +28,8 @@ int speed;
 int score;
 
 int block_id; //블럭의 종류를 나타낼 int 형 변수
+int next_block_id; //다음 블럭의 종류를 나타낼 int 형 변수
+
 
 char blockModel[][4][4] =
 {
@@ -489,11 +491,26 @@ void DrawGameBoard()
 }
 
 //게임 진행 스코어를 화면에 나타내는 함수
-void drawScore()
+void DrawScore()
 {
-	SetCurrentCursorPos(60, 15);
+	SetCurrentCursorPos(60, 20);
 	printf("Score : %d", score);
 }
+
+void ShowNextBlock()
+{
+	COORD temp = GetCurrentCursorPos();
+
+	SetCurrentCursorPos(60, 9);
+	printf("다음에 나타날 블럭");
+
+	SetCurrentCursorPos(60, 10);
+	DeleteBlock(blockModel[block_id]);
+	ShowBlock(blockModel[next_block_id]);
+
+	SetCurrentCursorPos(temp.X, temp.Y);
+}
+
 
 int main()
 {
@@ -503,14 +520,17 @@ int main()
 	setGameBoardInfo();
 	speed = 5;
 
-
+	next_block_id = rand() % 28;  	//랜덤한 블럭 원형을 생성한다.
 
 	while (1)		//전체 게임 진행을 위한 반복문
 	{
-		drawScore();
-		block_id = rand() % 28;		//랜덤한 블럭 원형을 생성한다.
+		block_id = next_block_id;
 		SetCurrentCursorPos(GAME_BOARD_START_X + GAME_BOARD_WIDTH, 0);
 		curPos = GetCurrentCursorPos();
+		DrawScore();
+
+		next_block_id = rand() % 28;
+		ShowNextBlock();
 
 
 		//벽돌이 위에 더 생성될 수 없으면 GameOver
