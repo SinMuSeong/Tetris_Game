@@ -15,11 +15,12 @@
 #define GAME_BOARD_START_Y 2
 
 //방향키 아스키코드 Define
+#define STOP 8
 #define LEFT 75
 #define RIGHT 77
 #define UP 72
 #define SPACE 32
-
+#define ENTER 13
 
 //게임 보드 정보 배열
 int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
@@ -540,7 +541,28 @@ void RemoveFillUpLine()
 }
 
 
+void StopGame()
+{
+	int cnt = 0;
+	COORD temp = GetCurrentCursorPos();
+	SetCurrentCursorPos(60, 23);
+	printf("취소하려면 백스페이스 키를 다시 누르세요\n");
+	while (1)
+	{
+		while (!_kbhit())
+		{
+			Sleep(10);
+		}
+		int k = _getch();
 
+		if (k == STOP)
+			break;
+	}
+	SetCurrentCursorPos(60, 23);
+	printf("                                                       ");
+
+	SetCurrentCursorPos(temp.X, temp.Y);
+}
 
 int IsGameOver()
 {
@@ -577,6 +599,8 @@ void InputOperationKey()
 			case SPACE:
 				SpaceDown();
 				break;
+			case STOP:
+				StopGame();
 			}
 		}
 		Sleep(speed);
@@ -653,9 +677,46 @@ void ShowNextBlock()
 	SetCurrentCursorPos(temp.X, temp.Y);
 }
 
+void ShowManual()
+{
+	printf("Enter : 플레이 시작");
+
+
+	const char* str[7];
+	int i = 1;
+	str[0] = "\n\n\n                    테르리스 게임";
+	str[1] = "\n\n\n                    블럭 이동 : 방향키";
+	str[2] = "\n\n\n                    블럭 하강 : 스페이스 바";
+	str[3] = "\n\n\n                    일시정지 : 백 스페이스";
+	str[4] = "\n\n\n                    5개의 줄을 완성시키면 다음 하강하는 블럭으로 지우개 블럭이 설정됩니다.";
+	str[5] = "\n\n\n                    지우개 블럭은 하강하면서 다른 블럭과 충돌 시 다른 블럭들을 삭제합니다. \n\n\n                    순발력을 발휘하여 지우개 블럭을 잘 활용해 보세요.";
+	str[6] = "\n\n\n                    플레이 하시려면   엔터 키를 누르세요.";
+
+	for (int i = 0; i < 7; i++)
+	{
+		printf("%s", str[i]);
+	}
+
+	while (1) {
+		while (!_kbhit());
+		int key = _getch();
+		if (key == ENTER) {
+			break;
+		}
+
+		else
+			continue;
+	}
+
+}
+
 
 int main()
 {
+	ShowManual();
+	system("cls"); //콘솔창 초기화
+
+
 	srand((unsigned int)time(NULL));
 	RemoveCursor();
 	DrawGameBoard();
