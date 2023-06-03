@@ -531,7 +531,7 @@ int main()
 	}
 
 
-	SetCurrentCursorPos(30, 0);
+	SetCurrentCursorPos(60, 5);
 	puts("Game Over!\n");
 	getchar();
 	
