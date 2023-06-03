@@ -500,6 +500,10 @@ void DrawScore()
 void ShowNextBlock()
 {
 	COORD temp = GetCurrentCursorPos();
+
+	SetCurrentCursorPos(60, 9);
+	printf("다음에 나타날 블럭");
+
 	SetCurrentCursorPos(60, 10);
 	DeleteBlock(blockModel[block_id]);
 	ShowBlock(blockModel[next_block_id]);
