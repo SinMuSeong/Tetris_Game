@@ -25,6 +25,7 @@
 int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
 
 int speed;
+int score;
 
 int block_id; //블럭의 종류를 나타낼 int 형 변수
 
@@ -408,7 +409,7 @@ void RemoveFillUpLine()
 		}
 		if (x == GAME_BOARD_WIDTH + 1)		//한 줄이 완성이 되어있으면
 		{
-
+			score += 10;
 			for (line = 0; y - line > 0; line++)	//완성된 아래의 줄에서 다음 윗줄 메모리 복사
 			{
 				memcpy(&gameBoardInfo[y - line][1], &gameBoardInfo[(y - line) - 1][1],
@@ -487,7 +488,12 @@ void DrawGameBoard()
 	}
 }
 
-
+//게임 진행 스코어를 화면에 나타내는 함수
+void drawScore()
+{
+	SetCurrentCursorPos(60, 15);
+	printf("Score : %d", score);
+}
 
 int main()
 {
@@ -501,6 +507,8 @@ int main()
 
 	while (1)		//전체 게임 진행을 위한 반복문
 	{
+		drawScore();
+
 		block_id = rand() % 7 * 4;		//랜덤한 블럭 원형을 생성한다.
 
 		SetCurrentCursorPos(GAME_BOARD_START_X + GAME_BOARD_WIDTH, 0);
