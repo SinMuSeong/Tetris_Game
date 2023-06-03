@@ -14,11 +14,6 @@
 #define GAME_BOARD_START_X 30
 #define GAME_BOARD_START_Y 2
 
-
-
-//게임 보드 정보 배열
-int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
-
 //방향키 아스키코드 Define
 #define LEFT 75
 #define RIGHT 77
@@ -26,6 +21,10 @@ int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
 #define SPACE 32
 
 
+//게임 보드 정보 배열
+int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
+
+int speed;
 
 int block_id; //블럭의 종류를 나타낼 int 형 변수
 
@@ -355,9 +354,74 @@ void RotateBlock()
 	ShowBlock(blockModel[block_id]);
 }
 
+void AddBlockToBoard()
+{
+	int x, y, arrCurX, arrCurY;
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 4; x++)
+		{
+			arrCurX = (curPos.X - GAME_BOARD_START_X) / 2;
+			arrCurY = curPos.Y - GAME_BOARD_START_Y;
+
+			if (blockModel[block_id][y][x] == 1)
+				gameBoardInfo[arrCurY + y][arrCurX + x] = 1;
+
+		}
+	}
+}
 
 
-void InputOperationrKey()
+//갱신된 게임 판 정보를 토대로 블럭들을 다시 그리는 함수
+void RedrawBlocks()
+{
+	int x, y;
+	int cursX, cursY;
+	for (y = 0; y < GAME_BOARD_HEIGHT; y++)
+	{
+		for (x = 1; x < GAME_BOARD_WIDTH + 1; x++)
+		{
+			cursX = x * 2 + GAME_BOARD_START_X;
+			cursY = y + GAME_BOARD_START_Y;
+			SetCurrentCursorPos(cursX, cursY);
+			if (gameBoardInfo[y][x] == 1)
+			{
+				printf("■");
+			}
+			else { printf("  "); }
+		}
+	}
+}
+
+
+//블럭 한 줄이 다 채워졌는지 게임 판 밑에서 부터 검사
+void RemoveFillUpLine()
+{
+	int line, x, y;
+
+	for (y = GAME_BOARD_HEIGHT - 1; y > 0; y--)
+	{
+		for (x = 1; x < GAME_BOARD_WIDTH + 1; x++)
+		{
+			if (gameBoardInfo[y][x] != 1)		//블럭 한 줄에 빈 칸이 있으면 종료
+				break;
+		}
+		if (x == GAME_BOARD_WIDTH + 1)		//한 줄이 완성이 되어있으면
+		{
+
+			for (line = 0; y - line > 0; line++)	//완성된 아래의 줄에서 다음 윗줄 메모리 복사
+			{
+				memcpy(&gameBoardInfo[y - line][1], &gameBoardInfo[(y - line) - 1][1],
+					GAME_BOARD_WIDTH * sizeof(int));
+			}
+			y++;
+		}
+		RedrawBlocks();
+	}
+}
+
+
+void InputOperationKey()
 {
 	int i, key;
 	for (i = 0; i < 20; i++)
@@ -380,7 +444,7 @@ void InputOperationrKey()
 				MoveDown();
 			}
 		}
-		Sleep(5);
+		Sleep(speed);
 	}
 }
 
@@ -424,27 +488,34 @@ int main()
 	RemoveCursor();
 	DrawGameBoard();
 	setGameBoardInfo();
+	speed = 5;
 
 
-	curPos.X = GAME_BOARD_START_X + 10;
-	curPos.Y = GAME_BOARD_START_Y + 10;
 
-	SetCurrentCursorPos(curPos.X, curPos.Y);
-	block_id = 1;
-	
-
-	ShowBlock(blockModel[block_id]);
-
-	while (1) 
+	while (1)		//전체 게임 진행을 위한 반복문
 	{
-		//MoveDown();
-		//RotateBlock();
-		
-		InputOperationrKey();
+		block_id = rand() % 7 * 4;		//랜덤한 블럭 원형을 생성한다.
 
-		Sleep(100);
+		SetCurrentCursorPos(GAME_BOARD_START_X + GAME_BOARD_WIDTH, 0);
+		curPos = GetCurrentCursorPos();
+
+
+		while (1)		//벽돌이 떨어지는 것을 구현한 반복문
+		{
+			if (MoveDown() == 0)		//MoveDown은 밑에 블럭이 있어 더 내려가지 못하면 0을 반환,
+			{
+				AddBlockToBoard();
+				RemoveFillUpLine();
+				break;
+			}
+			InputOperationKey();
+		}
 	}
-	
+
+
+	SetCurrentCursorPos(30, 0);
+	puts("Game Over!\n");
+	getchar();
 	
 	return 0;
 }
