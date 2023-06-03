@@ -508,11 +508,10 @@ int main()
 	while (1)		//전체 게임 진행을 위한 반복문
 	{
 		drawScore();
-
-		block_id = rand() % 7 * 4;		//랜덤한 블럭 원형을 생성한다.
-
+		block_id = rand() % 28;		//랜덤한 블럭 원형을 생성한다.
 		SetCurrentCursorPos(GAME_BOARD_START_X + GAME_BOARD_WIDTH, 0);
 		curPos = GetCurrentCursorPos();
+
 
 		//벽돌이 위에 더 생성될 수 없으면 GameOver
 		if (IsGameOver())
