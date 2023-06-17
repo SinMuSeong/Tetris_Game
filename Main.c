@@ -25,8 +25,8 @@
 //게임 보드 정보 배열
 int gameBoardInfo[GAME_BOARD_HEIGHT + 1][GAME_BOARD_WIDTH + 2];
 
-int speed;
-int score;
+int speed;	//게임 속도
+int score;	//게임 점수
 
 int block_id; //블럭의 종류를 나타낼 int 형 변수
 int next_block_id; //다음 블럭의 종류를 나타낼 int 형 변수
@@ -268,7 +268,7 @@ void setGameBoardInfo()
 }
 
 
-
+//블럭의 정보를 받고 해당 블록을 콘솔 창에 그리는 함수
 void ShowBlock(char blockInfo[4][4])
 {
 	int x, y;
@@ -295,7 +295,7 @@ void ShowBlock(char blockInfo[4][4])
 }
 
 
-
+//블록을 콘솔 창에서 지우는 함수
 void DeleteBlock(char blockInfo[4][4])
 {
 	int y, x;
@@ -333,7 +333,7 @@ int DetectCollision(int posX, int posY, char blockModel[4][4])
 }
 
 
-//충돌 판정 확인하는 함수  (해당 좌표에 대해 지우개 블럭이 충돌이면 0반환)
+//충돌 판정 확인하는 함수  (해당 좌표에 대해 지우개 블럭이 충돌이면 0반환)  (지우개 블럭 한정)
 int DetectCollision_erase(int posX, int posY, char blockModel[4][4])
 {
 	int x, y;
@@ -375,11 +375,11 @@ void setErase(int posX, int posY, char blockModel[4][4])
 
 int MoveDown()
 {
-	if (block_id == 28)
+	if (block_id == 28)	//지우개 블럭 예외
 	{
 		if (!DetectCollision_erase(curPos.X, curPos.Y + 1, blockModel[block_id]))
 		{
-			setErase(curPos.X, curPos.Y, blockModel[28]);
+			setErase(curPos.X, curPos.Y, blockModel[28]); //해당 위치의 블록을 지운다.
 			return 0;
 		}
 		setErase(curPos.X, curPos.Y, blockModel[28]);
@@ -393,6 +393,7 @@ int MoveDown()
 	}
 	else
 	{
+		//블록이 해당 방향으로 움직일 수 있는지 판별하는 조건문
 		if (!DetectCollision(curPos.X, curPos.Y + 1, blockModel[block_id]))
 			return 0;
 
@@ -460,6 +461,7 @@ void MoveLeft()
 	}
 }
 
+//콘솔 창에 나타난 블럭을 회전시키는 함수
 void RotateBlock()
 {
 	int block_origin = block_id - block_id % 4;		//회전하지 않은 원형 블럭의 배열 인덱스
@@ -473,6 +475,7 @@ void RotateBlock()
 	ShowBlock(blockModel[block_id]);
 }
 
+// 블록이 하강하여 정착하면, 해당 블록을 게임 정보를 담은 가상 배열에 1로 표기하여 게임보드를 업데이트하는 함수
 void AddBlockToBoard()
 {
 	int x, y, arrCurX, arrCurY;
@@ -540,14 +543,14 @@ void RemoveFillUpLine()
 	}
 }
 
-
+//게임 일시 정지
 void StopGame()
 {
 	int cnt = 0;
 	COORD temp = GetCurrentCursorPos();
 	SetCurrentCursorPos(60, 23);
 	printf("취소하려면 백스페이스 키를 다시 누르세요\n");
-	while (1)
+	while (1)		//탈출할 때 까지 무한 정지
 	{
 		while (!_kbhit())
 		{
@@ -555,7 +558,7 @@ void StopGame()
 		}
 		int k = _getch();
 
-		if (k == STOP)
+		if (k == STOP)		//백 스페이스 키 누르면 해당 반복문 탈출 -> 게임 재개
 			break;
 	}
 	SetCurrentCursorPos(60, 23);
@@ -564,6 +567,7 @@ void StopGame()
 	SetCurrentCursorPos(temp.X, temp.Y);
 }
 
+//게임이 끝났는 지 확인하는 함수
 int IsGameOver()
 {
 	if (!DetectCollision(curPos.X, curPos.Y, blockModel[block_id]))
@@ -572,11 +576,13 @@ int IsGameOver()
 	return 0;
 }
 
+//스페이스 바 (즉시 하강)
 void SpaceDown()
 {
 	while (MoveDown());
 }
 
+//사용자에게 키 입력을 받는 함수
 void InputOperationKey()
 {
 	int i, key;
@@ -646,6 +652,8 @@ void DrawScore()
 	printf("Score : %d", score);
 }
 
+
+//다음에 나타날 블럭을 콘솔창 오른쪽에 출력하여 플레이어 눈으로 확인할 수 있게 하는 함수 
 void ShowNextBlock()
 {
 	COORD temp = GetCurrentCursorPos();
@@ -734,20 +742,17 @@ int main()
 		curPos = GetCurrentCursorPos();
 		DrawScore();
 
-		if (checkEraseBlockCnt >= 5)
+		if (checkEraseBlockCnt >= 5)	//5번의 줄을 지울 때 마다 다음 블록으로 지우개 블록 설정
 		{
 			next_block_id = 28;
 			checkEraseBlockCnt = 0;
 		}
 		else
 		{
-			next_block_id = rand() % 28;
+			next_block_id = rand() % 28;	//그 외에는 랜덤하게 블록 생성
 		}
 		
-
-
-		ShowNextBlock();
-
+		ShowNextBlock();	//다음에 떨어질 블록을 오른쪽 화면에 보이게
 
 		//벽돌이 위에 더 생성될 수 없으면 GameOver
 		if (IsGameOver())
@@ -763,11 +768,11 @@ int main()
 					break;
 				}
 
-				AddBlockToBoard();
-				RemoveFillUpLine();
+				AddBlockToBoard();		//게임 블록 정보 배열에 해당 블록 추가
+				RemoveFillUpLine();		//한 줄이 완성되어있는지 검사 후, 완성 되어있으면 줄 지우고 블록 최신화
 				break;
 			}
-			InputOperationKey();
+			InputOperationKey();	//사용자에게 키 입력 받기
 		}
 	}
 
